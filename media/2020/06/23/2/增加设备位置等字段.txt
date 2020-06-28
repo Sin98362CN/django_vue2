@@ -1,0 +1,132 @@
+
+1、配置项（物理）增加设备位置字段，内容为	位置-机柜名称（艾溪湖-J02）
+2、供应商合同管理配置项增加货物名称、序列号、（品牌、型号）、设备位置、合同编号	asset_number
+
+
+
+class id="FunctionalCI"
+
+class id="PhysicalDevice"
+
+
+
+class id="DatacenterDevice"
+
+
+class id="ProviderContract"			
+	functionalcis_list		lnkFunctionalCIToProviderContract
+	
+	lnkFunctionalCIToProviderContract
+	lnkFunctionalCIToProviderContract
+	lnkFunctionalCIToProviderContract
+
+
+
+位置：
+	1、新建location_id2外键字段，不加name（因为tookit不会删除原先的字段，所以其实也可以不做，不过最好是做）
+	2、新建location_id、location_name字段，看报错信息，把存在重复的表单的字段隐藏
+
+            <attribute id="location_id"/>
+            <attribute id="location_name"/>
+
+
+        <field id="location_id" xsi:type="AttributeExternalKey">
+          <filter><![CDATA[SELECT l FROM Location AS l JOIN Organization AS root ON l.org_id=root.id JOIN Organization AS child ON child.parent_id BELOW root.id WHERE child.id= :this->org_id]]></filter>
+          <dependencies>
+            <attribute id="org_id"/>
+          </dependencies>
+          <sql>location_id</sql>
+          <target_class>Location</target_class>
+          <is_null_allowed>true</is_null_allowed>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+          <allow_target_creation>false</allow_target_creation>
+        </field>
+        <field id="location_name" xsi:type="AttributeExternalField">
+          <extkey_attcode>location_id</extkey_attcode>
+          <target_attcode>name</target_attcode>
+        </field>
+
+
+
+机柜：
+
+
+        <field id="rack_id" xsi:type="AttributeExternalKey">
+          <filter><![CDATA[SELECT Rack WHERE location_id= :this->location_id]]></filter>
+          <dependencies>
+            <attribute id="location_id"/>
+          </dependencies>
+          <sql>rack_id</sql>
+          <target_class>Rack</target_class>
+          <is_null_allowed>true</is_null_allowed>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+          <allow_target_creation>false</allow_target_creation>
+        </field>
+        <field id="rack_name" xsi:type="AttributeExternalField">
+          <extkey_attcode>rack_id</extkey_attcode>
+          <target_attcode>name</target_attcode>
+        </field>
+		
+        <field id="enclosure_id" xsi:type="AttributeExternalKey">
+          <filter><![CDATA[SELECT Enclosure WHERE rack_id= :this->rack_id]]></filter>
+          <dependencies>
+            <attribute id="rack_id"/>
+          </dependencies>
+          <sql>enclosure_id</sql>
+          <target_class>Enclosure</target_class>
+          <is_null_allowed>true</is_null_allowed>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+          <allow_target_creation>false</allow_target_creation>
+        </field>
+        <field id="enclosure_name" xsi:type="AttributeExternalField">
+          <extkey_attcode>enclosure_id</extkey_attcode>
+          <target_attcode>name</target_attcode>
+        </field>
+		
+		datamodels\2.x\itop-config-mgmt\datamodel.itop-config-mgmt.xml
+		datamodels\2.x\itop-config-mgmt\zh_cn.dict.itop-config-mgmt.php
+C:\Users\Sin\Desktop\省人社\20200330\01\datamodels\2.x\itop-datacenter-mgmt\datamodel.itop-datacenter-mgmt.xml
+		datamodels\2.x\itop-service-mgmt\datamodel.itop-service-mgmt.xml
+
+
+
+		
+品牌：
+
+	PhysicalDevice
+	
+        <field id="brand_id" xsi:type="AttributeExternalKey">
+          <sql>brand_id</sql>
+          <target_class>Brand</target_class>
+          <is_null_allowed>true</is_null_allowed>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+        </field>
+        <field id="brand_name" xsi:type="AttributeExternalField">
+          <extkey_attcode>brand_id</extkey_attcode>
+          <target_attcode>name</target_attcode>
+        </field>
+        <field id="model_id" xsi:type="AttributeExternalKey">
+          <filter><![CDATA[SELECT Model WHERE brand_id=:this->brand_id AND type=:this->finalclass]]></filter>
+          <dependencies>
+            <attribute id="brand_id"/>
+          </dependencies>
+          <sql>model_id</sql>
+          <target_class>Model</target_class>
+          <is_null_allowed>true</is_null_allowed>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+        </field>
+        <field id="model_name" xsi:type="AttributeExternalField">
+          <extkey_attcode>model_id</extkey_attcode>
+          <target_attcode>name</target_attcode>
+        </field>
+
+
+货物名称：
+	item_name
+		
+		
+		
+		
+		https://github.com/blackholll/loonflow.git
+
+
